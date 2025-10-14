@@ -33,10 +33,6 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-//    @Column(nullable = false)
-//    private LocalDateTime updated;
-
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
