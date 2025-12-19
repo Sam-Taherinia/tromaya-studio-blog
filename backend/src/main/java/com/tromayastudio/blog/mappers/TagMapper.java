@@ -1,7 +1,7 @@
 package com.tromayastudio.blog.mappers;
 
 import com.tromayastudio.blog.domain.PostStatus;
-import com.tromayastudio.blog.domain.dtos.TagResponse;
+import com.tromayastudio.blog.domain.dtos.TagDto;
 import com.tromayastudio.blog.domain.entities.Post;
 import com.tromayastudio.blog.domain.entities.Tag;
 import org.mapstruct.Mapper;
@@ -16,9 +16,9 @@ import java.util.Set;
 public interface TagMapper {
 
     @Mapping(target = "postCount", source = "posts", qualifiedByName = "calculatePostCount")
-    TagResponse toTagResponse(Tag tag);
+    TagDto toTagDto(Tag tag);
 
-    List<TagResponse> toTagResponseList(List<Tag> tags);
+    List<TagDto> toTagDtoList(List<Tag> tags);
 
     @Named("calculatePostCount")
     default Integer calculatePostCount(Set<Post> posts) {
