@@ -1,12 +1,16 @@
 package com.tromayastudio.blog.controllers;
 
+import com.tromayastudio.blog.domain.CreatePostRequest;
+import com.tromayastudio.blog.domain.dtos.CreatePostRequestDto;
 import com.tromayastudio.blog.domain.dtos.PostDto;
 import com.tromayastudio.blog.domain.entities.Post;
 import com.tromayastudio.blog.domain.entities.User;
 import com.tromayastudio.blog.mappers.PostMapper;
 import com.tromayastudio.blog.services.PostService;
 import com.tromayastudio.blog.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +43,16 @@ public class PostController {
         List<Post> draftPosts = postService.getDraftPosts(loggedInUser);
         List<PostDto> postDtos = draftPosts.stream().map(postMapper::toDto).toList();
         return ResponseEntity.ok(postDtos);
+    }
+
+    @PostMapping
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody CreatePostRequestDto createPostRequestDto,
+                                              @RequestAttribute UUID userId) {
+        User loggedInUser = userService.getUserById(userId);
+        CreatePostRequest createPostRequest = postMapper.toCreatePostRequest(createPostRequestDto);
+        Post createdPost = postService.createPost(loggedInUser, createPostRequest);
+        PostDto createdPostDto = postMapper.toDto(createdPost);
+        return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.tromayastudio.blog.mappers;
 
+import com.tromayastudio.blog.domain.CreatePostRequest;
+import com.tromayastudio.blog.domain.dtos.CreatePostRequestDto;
 import com.tromayastudio.blog.domain.dtos.PostDto;
 import com.tromayastudio.blog.domain.entities.Post;
 import org.mapstruct.Mapper;
@@ -13,5 +15,7 @@ public interface PostMapper {
     @Mapping(target = "category", source = "category")
     @Mapping(target = "tags", source = "tags")
     PostDto toDto(Post post);
+
+    CreatePostRequest toCreatePostRequest(CreatePostRequestDto dto);
 
 }
