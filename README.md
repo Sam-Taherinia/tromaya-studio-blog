@@ -1,6 +1,7 @@
 # Tromaya Studio Blog
 
 A modern, full-stack blog application built with Spring Boot backend and React frontend. This project features a robust content management system with user authentication, rich text editing, and responsive design.
+Special Thanks to Aaron Bourne from Devtiro for providing the tutorial and app-ui.
 
 ## 🚀 Features
 
