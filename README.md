@@ -4,14 +4,17 @@ A modern, full-stack blog application built with Spring Boot backend and React f
 
 ## 🚀 Features
 
-- **User Authentication & Authorization** with Spring Security
+- **User Authentication & Authorization** with Spring Security and JWT
 - **Rich Text Editor** using TipTap for creating and editing blog posts
 - **Responsive Design** with TailwindCSS and NextUI components
-- **Database Support** for both PostgreSQL (production) and H2 (testing)
-- **RESTful API** architecture
+- **Database Support** for PostgreSQL (production) and H2 (testing)
+- **RESTful API** architecture with comprehensive CRUD operations
 - **Modern UI/UX** with smooth animations using Framer Motion
 - **Content Sanitization** with DOMPurify for security
 - **Database Management** interface with Adminer
+- **Category and Tag Management** for content organization
+- **Draft System** for post management
+- **Protected Routes** with authentication guards
 
 ## 🏗️ Architecture
 
@@ -20,18 +23,22 @@ A modern, full-stack blog application built with Spring Boot backend and React f
 - **Java Version**: 21
 - **Database**: PostgreSQL (production) / H2 (testing)
 - **Security**: Spring Security with JWT authentication
-- **ORM**: Spring Data JPA
+- **ORM**: Spring Data JPA with Hibernate
 - **Build Tool**: Maven
-- **Additional Libraries**: Lombok for boilerplate reduction
+- **Additional Libraries**: 
+  - Lombok for boilerplate reduction
+  - MapStruct for object mapping
+  - JWT (io.jsonwebtoken) for token management
 
 ### Frontend (React)
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **UI Framework**: NextUI with TailwindCSS
 - **Rich Text Editor**: TipTap
-- **Routing**: React Router DOM
+- **Routing**: React Router DOM v7
 - **HTTP Client**: Axios
 - **Animations**: Framer Motion
+- **Security**: DOMPurify for content sanitization
 
 ## 📋 Prerequisites
 
@@ -101,6 +108,9 @@ The frontend application will be available at `http://localhost:5173`
 
 # Package the application
 ./mvnw clean package
+
+# Clean build artifacts
+./mvnw clean
 ```
 
 ### Frontend (npm)
@@ -117,7 +127,7 @@ npm run preview
 # Lint code
 npm run lint
 
-# Clean project
+# Clean project (removes node_modules, dist, etc.)
 npm run clean
 ```
 
@@ -125,50 +135,110 @@ npm run clean
 
 ```
 tromaya-studio-blog/
-├── backend/                 # Spring Boot backend
+├── backend/                           # Spring Boot backend
 │   ├── src/
 │   │   ├── main/
-│   │   │   ├── java/        # Java source code
-│   │   │   └── resources/   # Configuration files
-│   │   └── test/           # Test files
-│   ├── pom.xml             # Maven configuration
-│   └── docker-compose.yml  # Database setup
-├── app-ui/                 # React frontend
+│   │   │   ├── java/com/tromayastudio/blog/
+│   │   │   │   ├── config/            # Security configuration
+│   │   │   │   ├── controllers/       # REST controllers
+│   │   │   │   ├── domain/
+│   │   │   │   │   ├── dtos/          # Data Transfer Objects
+│   │   │   │   │   └── entities/      # JPA entities
+│   │   │   │   ├── mappers/           # MapStruct mappers
+│   │   │   │   ├── repositories/      # JPA repositories
+│   │   │   │   ├── security/          # JWT and security components
+│   │   │   │   └── services/          # Business logic services
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/                      # Test files
+│   ├── target/                        # Build output (ignored)
+│   ├── pom.xml                        # Maven configuration
+│   └── docker-compose.yml             # Database setup
+├── app-ui/                            # React frontend
 │   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── pages/          # Page components
-│   │   ├── hooks/          # Custom hooks
-│   │   ├── services/       # API services
-│   │   └── utils/          # Utility functions
-│   ├── package.json        # npm configuration
-│   ├── vite.config.ts      # Vite configuration
-│   └── tailwind.config.js  # TailwindCSS configuration
+│   │   ├── components/                # Reusable React components
+│   │   ├── pages/                     # Page components
+│   │   ├── services/                  # API service layer
+│   │   └── assets/                    # Static assets
+│   ├── public/                        # Public assets
+│   ├── dist/                          # Build output (ignored)
+│   ├── node_modules/                  # Dependencies (ignored)
+│   ├── package.json                   # npm configuration
+│   ├── vite.config.ts                 # Vite configuration
+│   └── tailwind.config.js             # TailwindCSS configuration
 └── README.md
 ```
 
-## 🔑 Environment Variables
+## 🔑 Environment Configuration
 
-### Backend
-Create `application.properties` in `backend/src/main/resources/`:
+### Backend Configuration
+The `application.properties` file contains:
 
 ```properties
+# Application
+spring.application.name=blog
+
+# JWT Configuration
+jwt.secret=your-256-bit-secret-key-here-make-it-at-least-32-bytes-long
+
 # Database Configuration
 spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
 spring.datasource.username=postgres
 spring.datasource.password=123456
+
+# JPA Configuration
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 # Security Configuration
-jwt.secret=your-jwt-secret-key
-jwt.expiration=86400000
+spring.security.user.name=admin
+spring.security.user.password=123456
 ```
 
-### Frontend
-Create `.env` in `app-ui/`:
+### Frontend Configuration
+The Vite configuration includes proxy setup for API calls:
 
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
+```typescript
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      }
+    }
+  }
+})
 ```
+
+## 🔌 API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration (if implemented)
+
+### Posts
+- `GET /api/posts` - Get all published posts
+- `GET /api/posts/{id}` - Get post by ID
+- `POST /api/posts` - Create new post (authenticated)
+- `PUT /api/posts/{id}` - Update post (authenticated)
+- `DELETE /api/posts/{id}` - Delete post (authenticated)
+- `GET /api/posts/drafts` - Get user's draft posts (authenticated)
+
+### Categories
+- `GET /api/categories` - Get all categories
+- `POST /api/categories` - Create category (authenticated)
+- `PUT /api/categories/{id}` - Update category (authenticated)
+- `DELETE /api/categories/{id}` - Delete category (authenticated)
+
+### Tags
+- `GET /api/tags` - Get all tags
+- `POST /api/tags` - Create tags (authenticated)
+- `PUT /api/tags/{id}` - Update tag (authenticated)
+- `DELETE /api/tags/{id}` - Delete tag (authenticated)
 
 ## 🚀 Deployment
 
@@ -186,6 +256,9 @@ npm run build
 # Deploy the dist/ folder to your hosting service
 ```
 
+### Docker Deployment (Optional)
+You can containerize both applications using Docker for easier deployment.
+
 ## 🧪 Testing
 
 ### Backend Tests
@@ -200,15 +273,31 @@ cd app-ui
 npm run test
 ```
 
-## 📝 API Documentation
+## 🔒 Security Features
 
-The backend provides RESTful APIs for:
-- User authentication (`/api/auth`)
-- Blog post management (`/api/posts`)
-- User management (`/api/users`)
-- Comments system (`/api/comments`)
+- **JWT Authentication**: Secure token-based authentication
+- **Content Sanitization**: DOMPurify prevents XSS attacks
+- **Protected Routes**: Authentication guards for sensitive operations
+- **CORS Configuration**: Proper cross-origin resource sharing setup
+- **Input Validation**: Server-side validation for all inputs
 
-API documentation will be available at `http://localhost:8080/swagger-ui.html` (if Swagger is configured).
+## 🎨 UI/UX Features
+
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Dark Mode Support**: Built-in dark mode with NextUI
+- **Rich Text Editor**: Full-featured editor with TipTap
+- **Smooth Animations**: Framer Motion for enhanced user experience
+- **Modern Components**: NextUI component library
+- **Accessible Design**: WCAG compliant components
+
+## 🛠️ Development Tools
+
+- **Hot Reload**: Both frontend and backend support hot reload
+- **Code Formatting**: ESLint for frontend code quality
+- **Type Safety**: TypeScript for frontend development
+- **Database Management**: Adminer for easy database administration
+- **Build Optimization**: Vite for fast frontend builds
+- **Annotation Processing**: Lombok and MapStruct for cleaner code
 
 ## 🤝 Contributing
 
@@ -222,7 +311,7 @@ API documentation will be available at `http://localhost:8080/swagger-ui.html` (
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## 👨💻 Author
 
 **Sam Taherinia**
 - GitHub: [@Sam-Taherinia](https://github.com/Sam-Taherinia)
@@ -233,6 +322,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - React community for the amazing ecosystem
 - TipTap for the rich text editor
 - NextUI for the beautiful components
+- MapStruct for object mapping
 - All contributors and supporters of this project
 
 ## 📞 Support
