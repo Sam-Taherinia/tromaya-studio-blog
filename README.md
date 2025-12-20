@@ -73,7 +73,7 @@ This will start:
 - **Host**: localhost:5432
 - **Database**: postgres
 - **Username**: postgres  
-- **Password**: 123456
+- **Password**: makeSureToReplaceYourPasswords
 
 ### 3. Backend Setup
 ```bash
@@ -184,7 +184,7 @@ jwt.secret=your-256-bit-secret-key-here-make-it-at-least-32-bytes-long
 # Database Configuration
 spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
 spring.datasource.username=postgres
-spring.datasource.password=123456
+spring.datasource.password=makeSureToReplaceYourPasswords
 
 # JPA Configuration
 spring.jpa.hibernate.ddl-auto=update
@@ -194,7 +194,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 # Security Configuration
 spring.security.user.name=admin
-spring.security.user.password=123456
+spring.security.user.password=makeSureToReplaceYourPasswords
 ```
 
 ### Frontend Configuration
